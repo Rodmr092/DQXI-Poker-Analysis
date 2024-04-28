@@ -1,0 +1,49 @@
+Observation,Hand,Last Double or Nothing,Success/Failure,Cumulative Winnings (b)
+1,Triple,3,0,-1
+2,First hand lost,0,0,-1
+3,Triple,2,0,-1
+4,First hand lost,0,0,-1
+5,First hand lost,0,0,-1
+6,Triple,4,1,4
+7,Two pairs,1,0,-1
+8,First hand lost,0,0,-1
+9,First hand lost,0,0,-1
+10,First hand lost,0,0,-1
+11,First hand lost,0,0,-1
+12,First hand lost,0,0,-1
+13,First hand lost,0,0,-1
+14,Two pairs,4,1,4
+15,Four pairs,2,0,-1
+16,First hand lost,0,0,-1
+17,Two pairs,4,1,4
+18,Two pairs,4,1,4
+19,Triple,1,0,-1
+20,First hand lost,0,0,-1
+21,First hand lost,0,0,-1
+22,First hand lost,0,0,-1
+23,Two pairs,2,0,-1
+24,First hand lost,0,0,-1
+25,First hand lost,0,0,-1
+26,First hand lost,0,0,-1
+27,Triple,0,0,-1
+28,Triple,0,0,-1
+29,Triple,1,0,-1
+30,Full House,4,1,20
+31,First hand lost,0,0,-1
+32,First hand lost,0,0,-1
+33,First hand lost,0,0,-1
+34,First hand lost,0,0,-1
+35,First hand lost,0,0,-1
+36,First hand lost,0,0,-1
+37,Two pairs,3,0,-1
+38,Flush (Color),4,1,16
+39,First hand lost,0,0,-1
+40,Triple,3,0,-1
+41,Triple,4,1,4
+42,First hand lost,0,0,-1
+43,First hand lost,0,0,-1
+44,First hand lost,0,0,-1
+45,First hand lost,0,0,-1
+46,First hand lost,0,0,-1
+47,First hand lost,0,0,-1
+48,Triple,4,1,4
