@@ -30,40 +30,54 @@ hand_bet_multipliers = {
     'r': 100, # Royal Flush
     'rj': 500 # Royal Jelly
 }
-initial_bet_scalar = 1  # Replace with user input if needed
+initial_bet_scalar = 1  # 1 by default, can be changed if needed
 
 
 # Data storage structure
 data_storage = []
 
-def summarize_data(num_rounds):
+# Function to check the last observation number in the CSV
+def get_last_observation(filename):
+    """Function to get the last observation number in the CSV file."""
+    last_observation = 0
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            reader = csv.DictReader(file)
+            last_observation = sum(1 for row in reader) - 1 # Exclude header
+    return last_observation
+
+def summarize_data(num_rounds, start_observation):
     """Function to summarize data and write to a single CSV file."""
     filename = f'frequencies_{num_rounds}.csv'
-    with open(filename, 'w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=['Observation', 'Hand', 'Last Double or Nothing', 'Success/Failure', 'Cumulative Winnings (b)'])
-        writer.writeheader()
-        for i, entry in enumerate(data_storage, 1):
+    header_written = os.path.exists(filename)
+    with open(filename, 'a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=['Observation', 'Hand', 'Last Won Round', 'Success/Failure', 'Win in b'])
+        if not header_written:
+            writer.writeheader()
+        #loop to begin writing data
+        for i, entry in enumerate(data_storage, start_observation):
             writer.writerow({
                 'Observation': i,
                 'Hand': entry['Hand'],
-                'Last Double or Nothing': entry['Last Double or Nothing'],
+                'Last Won Round': entry['Last Won Round'],
                 'Success/Failure': entry['Success/Failure'],
-                'Cumulative Winnings (b)': entry['Cumulative Winnings (b)'] if 'Cumulative Winnings (b)' in entry else 0  # This line is changed to provide a default of 0
+                'Win in b': entry['Win in b'] if 'Win in b' in entry else 0  # Ensure this line matches the fieldname
             })
     print(f"Data summarized and saved to {filename} in the current directory.")
 
 
-def signal_handler(sig, frame, num_rounds):
+def signal_handler(sig, frame, num_rounds, start_observation):
     print('Exiting the program...')
-    summarize_data(num_rounds)
+    summarize_data(num_rounds, start_observation)
     sys.exit(0)
 
 def main():
     global num_rounds  # Declare global variable for number of rounds to evaluate
+    num_rounds = int(input("Enter the number of double or nothing rounds to evaluate: "))
+    filename = f'frequencies_{num_rounds}.csv'
+    start_observation = get_last_observation(filename) + 1
+    signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, num_rounds, start_observation))
     try:
-        num_rounds = int(input("Enter the number of double or nothing rounds to evaluate: "))
-        signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, num_rounds))
-        
         while True:
             hand_input = input("Enter the hand (single letter or 0 if first hand was lost): ").lower()
             if hand_input in ["exit", "stop", "quit", "end", "e", "s", "q"]:
@@ -74,9 +88,9 @@ def main():
             if hand_input == "0":
                 data_storage.append({
                     'Hand': 'First hand lost',
-                    'Last Double or Nothing': '0',
+                    'Last Won Round': '0',
                     'Success/Failure': '0',
-                    'Cumulative Winnings (b)': -1 * initial_bet_scalar  # Assuming the player loses their initial bet when they lose the first hand
+                    'Win in b': -1 * initial_bet_scalar  # Assuming the player loses their initial bet when they lose the first hand
                 })
                 print("First hand lost, no further data required for this round.")
                 continue  # Skip the rest of the loop and wait for next input
@@ -93,25 +107,18 @@ def main():
             
             success = 1 if last_double_or_nothing == num_rounds else 0
             hand_bet_value = hand_bet_multipliers[hand_input]
-            cumulative_winnings = (last_double_or_nothing * hand_bet_value * success) - (1 - success)
-            cumulative_winnings *= initial_bet_scalar
+            win_in_b = (last_double_or_nothing * hand_bet_value * success) - (1 - success)
+            win_in_b *= initial_bet_scalar
 
             data_storage.append({
                 'Hand': hand_mapping[hand_input],
-                'Last Double or Nothing': last_double_or_nothing,
+                'Last Won Round': last_double_or_nothing,
                 'Success/Failure': success,
-                'Cumulative Winnings (b)': cumulative_winnings,
+                'win in b': win_in_b,
             })
             print(f"Data added: {hand_mapping[hand_input]}, {last_double_or_nothing}, {success}")
-        
     except EOFError:
-        end(None, None, num_rounds)
-
-def end(sig, frame, num_rounds):
-    """Handler for ending the program and summarizing data."""
-    print('Exiting the program...')
-    summarize_data(num_rounds)
-    sys.exit(0)
+        summarize_data(num_rounds, start_observation)
 
 if __name__ == '__main__':
     main()
